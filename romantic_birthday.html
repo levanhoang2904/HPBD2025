@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng Sinh Nhật</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+        
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;   
+            z-index: 0;
+            background: linear-gradient(to bottom, #4a1d96, #1e3a8a);
+        }
+        
+        /* Ngôi sao */
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+        }
+        
+        /* Xóa các lớp liên quan đến lồng đèn */
+        .lantern,
+        .lantern-top,
+        .lantern-body,
+        .lantern-text,
+        .lantern-bottom,
+        .lantern-string {
+            display: none;
+        }
+        
+        /* Thông điệp chúc mừng */
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            text-align: center;
+            opacity: 0;
+            transition: all 1s ease;
+        }
+        
+        .message.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        .message h1 {
+            color: #fcd34d;
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .message p {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 32px;
+        }
+        
+        .message button {
+            background-color: #ef4444;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 12px 32px;
+            border: none;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease;
+        }
+        
+        .message button:hover {
+            background-color: #dc2626;
+        }
+        
+        .camera-icon {
+            margin-right: 8px;
+            width: 24px;
+            height: 24px;
+        }
+        
+        /* Hiệu ứng chữ */
+        /* Container chứa các lá thư */
+        .letters-container {
+            position: absolute;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+        }
+        
+        /* Lá thư */
+        .letter {
+            position: relative;
+            width: 60px;
+            height: 40px;
+            background-color: #fcd34d;
+            border: 2px solid #f59e0b;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        /* Hình tam giác (nắp thư) */
+        .letter::before {
+            content: '';
+            position: absolute;
+            top: 0px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 30px solid transparent;
+            border-right: 30px solid transparent;
+            border-top: 20px solid #f59e0b;
+        }
+        
+        .letter:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Tin nhắn chào mừng */
+        .welcome-message {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        
+        /* Animations */
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(10deg);
+                opacity: 0.7;
+            }
+        }
+        
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+        
+        /* Hiệu ứng lắc qua lắc về với góc lớn hơn */
+        @keyframes swing {
+            0% {
+                transform: rotate(0deg);
+            }
+            25% {
+                transform: rotate(10deg); /* Tăng góc xoay */
+            }
+            50% {
+                transform: rotate(0deg);
+            }
+            75% {
+                transform: rotate(-10deg); /* Tăng góc xoay */
+            }
+            100% {
+                transform: rotate(0deg);
+            }
+        }
+
+        /* Hiệu ứng hiện text */
+        @keyframes showText {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Áp dụng hiệu ứng cho lời chúc */
+        .message.show h1 {
+            animation: showText 0.5s ease-out;
+        }
+        
+        .message-cake {
+            position: absolute;
+            top: 10%;
+            text-align: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.8);
+            z-index: 10;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: showMessage 1s forwards 1s;
+        }
+        
+        @keyframes showMessage {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .cake {
+            position: relative;
+            width: 250px;
+            height: 200px;
+            margin-top: 100px;
+            display: none;
+        }
+        
+        .plate {
+            position: absolute;
+            width: 270px;
+            height: 25px;
+            bottom: -10px;
+            left: -10px;
+            background-color: #e0e0e0;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cake-bottom {
+            position: absolute;
+            width: 250px;
+            height: 80px;
+            bottom: 0;
+            background-color: #fff0db;
+            border-radius: 15px 15px 60px 60px / 15px 15px 30px 30px;
+            box-shadow: 0 5px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        .cake-middle {
+            position: absolute;
+            width: 220px;
+            height: 60px;
+            bottom: 80px;
+            left: 15px;
+            background-color: #ffd0d0;
+            border-radius: 12px 12px 40px 40px / 12px 12px 20px 20px;
+            box-shadow: 0 5px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        .cake-top {
+            position: absolute;
+            width: 180px;
+            height: 40px;
+            bottom: 140px;
+            left: 35px;
+            background-color: #ffa8a8;
+            border-radius: 10px 10px 20px 20px / 10px 10px 10px 10px;
+            box-shadow: 0 5px 0 rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+        
+        .icing {
+            position: absolute;
+            width: 100%;
+            height: 15px;
+            background-color: #fff;
+            border-radius: 10px;
+            top: -8px;
+        }
+        
+        .icing-drip {
+            position: absolute;
+            width: 30px;
+            height: 20px;
+            background-color: #fff;
+            border-radius: 0 0 15px 15px;
+            top: 0;
+        }
+        
+        .candle {
+            position: absolute;
+            width: 10px;
+            height: 30px;
+            background: linear-gradient(to bottom, #ff9800, #ff5722);
+            bottom: 181px;
+            left: 120px;
+            z-index: 0;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+        }
+        
+        .flame {
+            position: absolute;
+            width: 12px;
+            height: 30px;
+            background: radial-gradient(ellipse at center, #ffff00, #ff9800);
+            border-radius: 50% 50% 35% 35%;
+            top: -25px;
+            left: -1px;
+            transform-origin: center bottom;
+            animation: flicker 0.3s infinite alternate;
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.8), 0 0 40px rgba(255, 165, 0, 0.6);
+        }
+        
+        @keyframes flicker {
+            0%, 100% {
+                transform: scaleY(1) rotate(-2deg);
+                opacity: 0.9;
+            }
+            25% {
+                transform: scaleY(1.1) rotate(1deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scaleY(0.9) rotate(-1deg);
+                opacity: 0.8;
+            }
+            75% {
+                transform: scaleY(1.05) rotate(2deg);
+                opacity: 0.95;
+            }
+        }
+        
+        /* Trang trí bánh */
+        .decoration {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ff69b4;
+            z-index: 5;
+        }
+        
+        .hearts {
+            position: absolute;
+            color: #ff3366;
+            font-size: 16px;
+            animation: float 3s ease-in-out infinite;
+            opacity: 0;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            25% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(20deg);
+                opacity: 0;
+            }
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            top: -50px;
+            z-index: -1;
+            opacity: 0;
+        }
+        
+        .instructions {
+            position: absolute;
+            bottom: 10%;
+            color: white;
+            text-align: center;
+            font-size: 1rem;
+            animation: pulse 2s infinite;
+            bottom: 127px;
+            display: none;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+        
+        .cake:hover .flame, .cake:active .flame {
+            animation: blowOut 0.5s forwards;
+        }
+        
+        @keyframes blowOut {
+            0% {
+                transform: scaleY(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scaleY(0);
+                opacity: 0;
+            }
+        }
+        .hpbd-message,
+        .end-message {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+            display: none;
+        }
+
+        .hpbd-message {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.8);
+        }
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        /* Nội dung modal */
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Nút đóng modal */
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .close-button:hover {
+            color: #f00;
+        }
+
+        .modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.modal-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.modal-button.agree {
+    background-color: #4caf50;
+    color: white;
+}
+
+.modal-button.agree:hover {
+    background-color: #388e3c;
+}
+
+.modal-button.disagree {
+    background-color: #f44336;
+    color: white;
+}
+
+.modal-button.disagree:hover {
+    background-color: #d32f2f;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Ngôi sao sẽ được thêm bằng JavaScript -->
+        <div class="cake" id="cake">
+            <div class="plate"></div>
+            <div class="cake-bottom">
+                <div class="icing"></div>
+            </div>
+            <div class="cake-middle">
+                <div class="icing"></div>
+            </div>
+            <div class="cake-top">
+                <div class="icing"></div>
+            </div>
+            <div class="candle">
+                <div class="flame" id="flame"></div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            Nhấp hoặc chạm vào bánh để thổi nến!
+        </div>
+
+        <!-- Thông điệp chúc mừng sinh nhật -->
+        <div class="message" id="birthdayMessage">
+            <h1>Chúc Mừng<br>Sinh Nhật!</h1>
+            <p>Chúc bé một ngày đặc biệt thật tuyệt vời!</p>
+        </div>
+        
+        <!-- Các thông điệp ngắn -->
+        <div class="letters-container">
+            <div class="letter" style="font-size: 6px;" data-message="Chúc mừng sinh nhật! Chúc bé iu một tuổi mới thật nhiều sức khỏe, niềm vui và hạnh phúc. 🎉"></div>
+            <div class="letter" style="font-size: 6px;" data-message="Sinh nhật vui vẻ nhé! Mong rằng món quà đặc biệt này mang đến cho bé thật nhiều tiếng cười, hạnh phúc và những khoảnh khắc đáng nhớ bên người yêu đẹp chai. 🎂"></div>
+            <div class="letter" style="font-size: 6px;" data-message="Tuổi mới nên bé quên hết buồn phiền mà do anh tạo nên đi hấy hehe 🥳"></div>
+            <div class="letter" style="font-size: 6px;" data-message="Chúc bé luôn hạnh phúc và mãi mãi yêu anh! 🌟"></div>
+            <div class="letter" style="font-size: 6px;" data-message="Sinh nhật vui vẻ, bé là người tuyệt vời nhất! ❤️"></div>
+        </div>
+        
+        <!-- Tin nhắn chào mừng -->
+        <div class="welcome-message">
+            <p>Hãy bấm vào một lá thư để nhận thông điệp đặc biệt! ✨</p>
+        </div>
+
+        <div class="end-message">
+            <p>Bấm vào đây để xem thông điệp đặc biệt nhé bé iu! ✨</p>
+        </div>
+
+        <h2 class="hpbd-message">
+            Happy Birthday, Bé Yêu
+        </h2>
+
+        <!-- Modal -->
+        <div class="modal" id="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-button" id="closeModal">&times;</span>
+                <h2>Thông điệp đặc biệt</h2>
+                <p>Bé làm món ăn của a nhé! 🎉</p>
+                <div class="modal-buttons">
+                    <button id="agreeButton" class="modal-button agree">Đồng ý</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const letters = document.querySelectorAll('.letter');
+            const message = document.getElementById('birthdayMessage');
+            const modal = document.getElementById('modal');
+            const closeModal = document.getElementById('closeModal');
+            const endMessage = document.querySelector('.end-message');
+
+            // Thêm sự kiện click cho từng lá thư
+            letters.forEach(letter => {
+                letter.addEventListener('click', function () {
+                    const text = this.getAttribute('data-message');
+                    const messageText = message.querySelector('h1');
+                    messageText.style.fontSize = '20px';
+                    // Cập nhật nội dung và thêm hiệu ứng
+                    messageText.innerHTML = text;
+                    message.classList.add('show');
+                    if (text === 'Sinh nhật vui vẻ, bé là người tuyệt vời nhất! ❤️') {
+                        document.querySelector('.welcome-message').style = 'display: none;';
+                        document.querySelector('.end-message').style = 'display: block;';
+                    }
+                    // Đảm bảo hiệu ứng chạy lại nếu bấm nhiều lần
+                    messageText.style.animation = 'none';
+                    setTimeout(() => {
+                        messageText.style.animation = '';
+                    }, 10);
+                });
+            });
+            
+            // Hàm tạo ngôi sao (giữ nguyên)
+            function createStar() {
+                const star = document.createElement('div');
+                star.classList.add('star');
+
+                const size = Math.random() * 3 + 1;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const duration = Math.random() * 3 + 2;
+
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${posX}%`;
+                star.style.top = `${posY}%`;
+                star.style.animation = `twinkle ${duration}s infinite`;
+
+                document.querySelector('.container').appendChild(star);
+            }
+
+            // Tạo các ngôi sao
+            for (let i = 0; i < 50; i++) {
+                createStar();
+            }
+
+            const cake = document.getElementById('cake');
+            const container = document.querySelector('.container');
+            const flame = document.getElementById('flame');
+            
+            // Tạo các trang trí bánh
+            addCakeDecorations();
+            
+            // Xử lý sự kiện khi người dùng nhấp vào bánh
+            cake.addEventListener('click', function() {
+                blowCandle();
+            });
+            
+            // Thêm trang trí cho bánh kem
+            function addCakeDecorations() {
+                // Thêm kem chảy xuống
+                const dripPositions = [10, 40, 80, 120, 160, 200, 230];
+                
+                // Kem chảy xuống tầng dưới
+                dripPositions.forEach(pos => {
+                    const drip = document.createElement('div');
+                    drip.classList.add('icing-drip');
+                    drip.style.left = `${pos}px`;
+                    document.querySelector('.cake-bottom .icing').appendChild(drip);
+                });
+                
+                // Kem chảy xuống tầng giữa
+                dripPositions.slice(1, -1).forEach(pos => {
+                    const drip = document.createElement('div');
+                    drip.classList.add('icing-drip');
+                    drip.style.left = `${pos - 15}px`;
+                    document.querySelector('.cake-middle .icing').appendChild(drip);
+                });
+                
+                // Kem chảy xuống tầng trên
+                dripPositions.slice(2, -2).forEach(pos => {
+                    const drip = document.createElement('div');
+                    drip.classList.add('icing-drip');
+                    drip.style.left = `${pos - 40}px`;
+                    document.querySelector('.cake-top .icing').appendChild(drip);
+                });
+                
+                // Thêm trang trí viên bi
+                const decorColors = ['#ff69b4', '#64b5f6', '#ffeb3b', '#66bb6a', '#9575cd'];
+                
+                // Trang trí tầng dưới
+                for (let i = 0; i < 10; i++) {
+                    addDecoration(
+                        Math.random() * 230 + 10,
+                        Math.random() * 60 + 5,
+                        decorColors[Math.floor(Math.random() * decorColors.length)],
+                        '.cake-bottom'
+                    );
+                }
+                
+                // Trang trí tầng giữa
+                for (let i = 0; i < 8; i++) {
+                    addDecoration(
+                        Math.random() * 190 + 15,
+                        Math.random() * 40 + 5,
+                        decorColors[Math.floor(Math.random() * decorColors.length)],
+                        '.cake-middle'
+                    );
+                }
+                
+                // Trang trí tầng trên
+                for (let i = 0; i < 6; i++) {
+                    addDecoration(
+                        Math.random() * 150 + 15,
+                        Math.random() * 25 + 5,
+                        decorColors[Math.floor(Math.random() * decorColors.length)],
+                        '.cake-top'
+                    );
+                }
+            }
+            
+            // Thêm một viên trang trí
+            function addDecoration(x, y, color, parent) {
+                const decor = document.createElement('div');
+                decor.classList.add('decoration');
+                decor.style.left = `${x}px`;
+                decor.style.top = `${y}px`;
+                decor.style.backgroundColor = color;
+                document.querySelector(parent).appendChild(decor);
+            }
+            
+            // Thổi nến và tạo hiệu ứng
+            function blowCandle() {
+                flame.style.animation = 'blowOut 0.5s forwards';
+                
+                // Sau khi thổi nến, tạo hiệu ứng tim và pháo hoa
+                setTimeout(function() {
+                    createHearts();
+                    createConfetti();
+                    
+                    // Thay đổi thông báo
+                    document.querySelector('.instructions').textContent = 'Chúc bé một ngày sinh nhật tuyệt vời!';
+                }, 500);
+            }
+            
+            // Tạo hiệu ứng trái tim
+            function createHearts() {
+                for (let i = 0; i < 20; i++) {
+                    setTimeout(() => {
+                        const heart = document.createElement('div');
+                        heart.classList.add('hearts');
+                        heart.innerHTML = '❤️';
+                        heart.style.left = `${Math.random() * 250}px`;
+                        heart.style.bottom = `${Math.random() * 50 + 100}px`;
+                        heart.style.animationDelay = `${Math.random() * 2}s`;
+                        heart.style.fontSize = `${Math.random() * 10 + 10}px`;
+                        cake.appendChild(heart);
+                        
+                        // Xóa trái tim sau khi hoàn thành animation
+                        setTimeout(() => {
+                            heart.remove();
+                        }, 3000);
+                    }, i * 100);
+                }
+            }
+            
+            // Tạo hiệu ứng pháo hoa
+            function createConfetti() {
+                const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f', '#ff69b4'];
+                
+                for (let i = 0; i < 100; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        confetti.classList.add('confetti');
+                        confetti.style.left = `${Math.random() * 100}%`;
+                        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                        
+                        // Thêm hình dạng ngẫu nhiên
+                        if (Math.random() > 0.5) {
+                            confetti.style.borderRadius = '50%';
+                        } else {
+                            confetti.style.width = '5px';
+                            confetti.style.height = '15px';
+                        }
+                        
+                        container.appendChild(confetti);
+                        
+                        // Tạo animation cho pháo hoa
+                        confetti.animate([
+                            { transform: `translate(0, 0) rotate(0deg)`, opacity: 0 },
+                            { transform: `translate(${Math.random() * 200 - 100}px, ${Math.random() * 200 + 100}px) rotate(${Math.random() * 360}deg)`, opacity: 1 },
+                            { transform: `translate(${Math.random() * 400 - 200}px, ${Math.random() * 300 + 300}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                        ], {
+                            duration: Math.random() * 2000 + 1000,
+                            easing: 'cubic-bezier(0.215, 0.610, 0.355, 1.000)',
+                            fill: 'forwards'
+                        });
+                        
+                        // Xóa pháo hoa sau khi hoàn thành animation
+                        setTimeout(() => {
+                            confetti.remove();
+                        }, 3000);
+                    }, i * 20);
+                }
+            }
+
+            // Đóng modal khi nhấp vào nút đóng
+            closeModal.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+
+            // Mở modal khi nhấp vào thông điệp đặc biệt
+            endMessage.addEventListener('click', function () {
+                modal.style.display = 'flex';
+            });
+
+            // Đảm bảo modal đóng khi nhấp ra ngoài nội dung modal
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('modal');
+    const closeModal = document.getElementById('closeModal');
+    const agreeButton = document.getElementById('agreeButton');
+    const disagreeButton = document.getElementById('disagreeButton');
+
+    // Đóng modal khi nhấp vào nút đóng
+    closeModal.addEventListener('click', function () {
+        modal.style.display = 'none';
+    });
+
+    // Xử lý khi bấm vào nút "Đồng ý"
+    agreeButton.addEventListener('click', function () {
+        document.querySelector('.cake').style.display = 'block';
+        modal.style.display = 'none';
+        document.querySelector('.message').style.display = 'none';
+        document.querySelector('.hpbd-message').style.display = 'block';
+        document.querySelector('.end-message').style.display = 'none';
+        document.querySelector('.instructions').style.display = 'block';
+        document.querySelector('.instructions').textContent = 'Nhấp hoặc chạm vào bánh để thổi nến!';
+
+    });
+
+    // Xử lý khi bấm vào nút "Không đồng ý"
+    disagreeButton.addEventListener('click', function () {
+        alert('Rất tiếc bé không đồng ý. 😢');
+        modal.style.display = 'none';
+    });
+
+    // Đảm bảo modal đóng khi nhấp ra ngoài nội dung modal
+    window.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+});
+    </script>
+</body>
+</html>
